@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <title>SSE Chat</title>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+
+</head>
+
+<body>
+  <!— Пользовательский интерфейс чата сводится всего лишь к простому полю ввода текста. —>
+    <!— Новые сообщения в чате будут вставляться перед этим полем ввода. —>
+      <input id="input" style="width:100%; padding:10рх; border:solid black 2px" />
+      <script>
+        // Позаботиться о некоторых деталях пользовательского интерфейса.
+      let nick = prompt("Enter Your Name");
+      let input = document.getElementById("input");
+
+ 
+
+      input.focus();
+      // Зарегистрировать прослушиватель для уведомления о новых сообщениях,
+      // используя EventSource.
+      let chat = new EventSource("/chat");
+      chat.addEventListener("chat", (event)=> {
+        let div = document.createElement("div");
+        div.append(event.data);
+        input.before(div);
+        input.scrollIntoView();
+      });
+      
+      // Отправить сообщения пользователя серверу, используя fetch() 
+      input.addEventListener("change", ()=> {
+        fetch("/chat", {
+          method: "POST",
+          body: new Date().toLocaleTimeString().slice(0,-3) + " " + nick + ": " + input.value
+        }).catch(error => console.error);
+        input.value = "";
+      });
+      
+      </script>
+   
+</body>
+
+</html>
